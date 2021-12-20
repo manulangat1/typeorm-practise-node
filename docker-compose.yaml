@@ -1,0 +1,65 @@
+version: "3.7"
+services:
+
+
+  service2:
+    # build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: manulangat/cheki-wasee # goes to your repository on Docker Hub
+    container_name: dockerapp
+    restart: always
+    env_file: .env
+    environment:
+      - PORT=${PORT}
+      - NODE_ENV=${NODE_ENV}
+    ports:
+      - 8000:8000
+    external_links:
+      - postgres
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 3050manu
+      PGPORT : 5433
+      # ONLY USE FOR RUNNING LOCALLY OR IN CI/CD
+      # POSTGRES_HOST_AUTH_METHOD: trust
+
+    ports:
+      - "5433:5433"
+    restart: always
+
+      
+  # mongo:
+  #   container_name: mongo
+  #   image: mongo
+  #   
+  #   volumes:
+  #     - ./data:/data/db
+  #   ports:
+  #     - 27017:27017
+  app:
+    container_name: app
+    restart: always
+    # tag:
+    #   manulangat1/cheki-wasee
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      - PORT=${PORT}
+      - NODE_ENV=${NODE_ENV}
+    ports:
+      - 8000:8000
+    external_links:
+      - postgres
+    depends_on:
+      - postgres
+volumes:
+  mongo-data:
+    driver: local
